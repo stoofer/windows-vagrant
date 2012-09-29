@@ -14,7 +14,11 @@ Vagrant::Config.run do |config|
      chef.add_role "windows-developer"
   
      # You may also specify custom JSON attributes:
-     #chef.json = { :bar => "foo" }
+    chef.json = { 
+      :vs2012 => { 
+        :product_key => "4D9749QX429Y43GYJ7JGJDYBP" 
+      } 
+    }
   end
 
   # Boot with a GUI so you can see the screen. (Default is headless)
