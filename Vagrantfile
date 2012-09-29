@@ -16,7 +16,7 @@ Vagrant::Config.run do |config|
      # You may also specify custom JSON attributes:
     chef.json = { 
       :vs2012 => { 
-        :product_key => "4D9749QX429Y43GYJ7JGJDYBP" 
+        :product_key => ENV["VS2012_KEY"]
       } 
     }
   end
