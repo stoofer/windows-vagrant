@@ -7,6 +7,7 @@
 # All rights reserved - Do Not Redistribute
 #
 
-file 'hello.log' do
-  action :create_if_missing
+windows_package "Notepad++" do
+  source "http://download.tuxfamily.org/notepadplus/6.1.8/npp.6.1.8.Installer.exe"
+  action :install
 end
