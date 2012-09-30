@@ -16,32 +16,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "java"
+#TODO - move jdk into java
+if(node["platform"] != "windows")
+  include_recipe "java"
 
-jar_file ="#{node[:leiningen][:jar_dir]}/leiningen-#{node[:leiningen][:version]}-standalone.jar"
+  jar_file ="#{node[:leiningen][:jar_dir]}/leiningen-#{node[:leiningen][:version]}-standalone.jar"
 
-remote_file "/usr/local/bin/lein" do
-  source node[:leiningen][:install_script]
-  owner "root"
-  group "root"
-  mode 0755
-  notifies :create, "ruby_block[lein-system-wide]", :immediately
-  not_if "grep -qx 'export LEIN_VERSION=\"#{node[:leiningen][:version]}\"' /usr/local/bin/lein"
-end
-
-ruby_block "lein-system-wide" do
-  block do
-    rc = Chef::Util::FileEdit.new("/usr/local/bin/lein")
-    rc.search_file_replace_line(/^LEIN_JAR=.*/, "LEIN_JAR=#{jar_file}")
-    rc.write_file
+  remote_file "/usr/local/bin/lein" do
+    source node[:leiningen][:install_script]
+    owner "root"
+    group "root"
+    mode 0755
+    notifies :create, "ruby_block[lein-system-wide]", :immediately
+    not_if "grep -qx 'export LEIN_VERSION=\"#{node[:leiningen][:version]}\"' /usr/local/bin/lein"
   end
-  action :nothing
-end
+  
+  ruby_block "lein-system-wide" do
+    block do
+      rc = Chef::Util::FileEdit.new("/usr/local/bin/lein")
+      rc.search_file_replace_line(/^LEIN_JAR=.*/, "LEIN_JAR=#{jar_file}")
+      rc.write_file
+    end
+    action :nothing
+  end
+  
+  remote_file jar_file do
+    source node[:leiningen][:jar_url]
+    owner "root"
+    group "root"
+    mode 0644
+    checksum node[:leiningen][:jar_checksum]
+  end
+else
+  include_recipe "jdk"
 
-remote_file jar_file do
-  source node[:leiningen][:jar_url]
-  owner "root"
-  group "root"
-  mode 0644
-  checksum node[:leiningen][:jar_checksum]
+  lein_home = "c:\\utils\\leiningen"
+  jar_file ="#{lein_home}\\leiningen-#{node[:leiningen][:version]}-standalone.jar"
+  lein_bat = "#{lein_home}\\lein.bat"
+  
+  directory lein_home do
+    rights :full_control, "Everyone"
+    inherits false
+    action :create
+  end
+  
+  remote_file lein_bat do
+    source node[:leiningen][:lein_bat_url]
+    rights :full_control, "Everyone"
+    inherits false
+    action :create_if_missing
+    #TODO - handle upgrades?
+  end
+
+  remote_file jar_file do
+    source node[:leiningen][:jar_url]
+    rights :full_control, "Everyone"
+    inherits false
+    action :create_if_missing
+    checksum node[:leiningen][:jar_checksum]
+  end
+
+  env 'LEIN_HOME' do
+    value lein_home
+    action :create
+  end
+
+  env 'LEIN_JAR' do
+    value jar_file
+    action :create
+  end
+
+  windows_path '%LEIN_HOME%' do
+    action :add
+  end
+
 end
