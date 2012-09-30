@@ -6,6 +6,7 @@ Vagrant::Config.run do |config|
   config.vm.guest = :windows
   config.vm.forward_port 3389, 3390, :name => "rdp", :auto => true
   config.vm.forward_port 5985, 5985, :name => "winrm", :auto => true
+  config.vm.forward_port 4567, 4567, :name => "riemann-dashboard", :auto => true
 
   config.vm.provision :chef_solo do |chef|
      chef.cookbooks_path = "kitchen/cookbooks"
