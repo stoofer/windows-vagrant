@@ -26,11 +26,10 @@ when "centos","redhat","scientific","fedora"
   end
   package "git"
 when "windows"
-  windows_package "git" do
+  windows_package "Git version 1.7.9-preview20120201" do
     source node[:git][:url]
     checksum node[:git][:checksum]
     action :install
-    not_if { File.exists? 'C:\Program Files (x86)\Git\bin\git.exe' }
   end
 when "mac_os_x"
   dmg_package "GitOSX-Installer" do

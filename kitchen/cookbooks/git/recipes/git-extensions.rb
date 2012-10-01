@@ -17,9 +17,8 @@
 # limitations under the License.
 
 if node[:platform] == "windows"
-  windows_package "git_extensions" do
+  windows_package "Git Extensions 2.41" do
     source node[:git][:git_extensions_url]
     action :install
-    not_if { File.exists? 'C:\Program Files (x86)\GitExtensions\GitExtensions.exe' }
   end
 end
